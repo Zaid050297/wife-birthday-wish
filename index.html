@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Special Surprise For You ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Romantic Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05020a;
+            font-family: 'Poppins', sans-serif;
+            touch-action: manipulation;
+        }
+
+        /* Canvas occupies full background */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        /* Typography styles */
+        .font-romantic {
+            font-family: 'Great Vibes', cursive;
+        }
+        
+        .font-royal {
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        /* Glowing Text Effects */
+        .glow-gold {
+            color: #fff;
+            text-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.8),
+                0 0 20px rgba(255, 105, 180, 0.8),
+                0 0 40px rgba(224, 17, 95, 0.8),
+                0 0 80px rgba(224, 17, 95, 0.6);
+        }
+
+        .glow-pink {
+            color: #ffe4e1;
+            text-shadow: 
+                0 0 8px rgba(255, 20, 147, 0.9),
+                0 0 18px rgba(255, 105, 180, 0.7),
+                0 0 35px rgba(224, 17, 95, 0.6);
+        }
+
+        /* Gift Box Floating & Pulsing Animation */
+        @keyframes floatPulse {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                filter: drop-shadow(0 0 20px rgba(255, 42, 133, 0.6));
+            }
+            50% {
+                transform: translateY(-12px) scale(1.06);
+                filter: drop-shadow(0 0 35px rgba(255, 215, 0, 0.9));
+            }
+        }
+
+        .gift-animate {
+            animation: floatPulse 2.5s infinite ease-in-out;
+        }
+
+        /* Message Entrance Animations */
+        @keyframes revealTitle {
+            0% {
+                opacity: 0;
+                transform: scale(0.7) translateY(30px);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0px);
+            }
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.18); }
+            60% { transform: scale(1); }
+        }
+
+        .animate-title {
+            animation: revealTitle 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .animate-subtitle {
+            opacity: 0;
+            animation: fadeUp 1.5s ease-out 1.2s forwards;
+        }
+
+        .animate-card {
+            opacity: 0;
+            animation: fadeUp 1.5s ease-out 2.4s forwards;
+        }
+
+        .heart-beat {
+            display: inline-block;
+            animation: heartbeat 1.8s infinite;
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(25, 10, 35, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 182, 193, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(224, 17, 95, 0.25);
+        }
+
+        /* Button Ripple/Glow */
+        .btn-glow {
+            background: linear-gradient(135deg, #e0115f 0%, #ff1493 50%, #ff8c00 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            box-shadow: 0 0 25px rgba(224, 17, 95, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glow:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="relative flex items-center justify-center">
+
+    <!-- Background Fireworks & Stars Canvas -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- Top Right Controls (Hidden Initially) -->
+    <div id="topControls" class="fixed top-4 right-4 z-30 hidden flex items-center gap-2 sm:gap-3">
+        <button id="grandFinaleBtn" class="glass-card text-white text-xs sm:text-sm px-3 py-2 rounded-full flex items-center gap-1.5 hover:bg-pink-600/40 active:scale-95 transition border border-pink-400/40 shadow-lg">
+            <span>🎆</span> <span class="font-medium">Grand Finale</span>
+        </button>
+        <button id="muteBtn" class="glass-card text-white p-2.5 rounded-full hover:bg-pink-600/40 active:scale-95 transition border border-pink-400/40 shadow-lg" aria-label="Toggle Sound">
+            <span id="soundIcon" class="text-base sm:text-lg leading-none">🔊</span>
+        </button>
+    </div>
+
+    <!-- INITIAL STATE: Gift Box Overlay -->
+    <div id="startScreen" class="relative z-20 flex flex-col items-center justify-center px-6 text-center transition-all duration-700 ease-in-out">
+        <!-- Glowing Gift Box SVG -->
+        <div id="giftTrigger" class="cursor-pointer gift-animate mb-6 p-4 rounded-full">
+            <svg class="w-28 h-28 sm:w-36 sm:h-36 mx-auto" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Glow behind gift -->
+                <circle cx="60" cy="60" r="50" fill="url(#glowGrad)" opacity="0.4"/>
+                <!-- Box Base -->
+                <rect x="25" y="55" width="70" height="50" rx="6" fill="url(#boxGrad)" stroke="#FFD700" stroke-width="2"/>
+                <!-- Box Lid -->
+                <rect x="20" y="40" width="80" height="18" rx="5" fill="url(#lidGrad)" stroke="#FFD700" stroke-width="2"/>
+                <!-- Vertical Gold Ribbon -->
+                <rect x="53" y="40" width="14" height="65" fill="url(#goldGrad)"/>
+                <!-- Horizontal Gold Ribbon -->
+                <rect x="25" y="73" width="70" height="12" fill="url(#goldGrad)"/>
+                <!-- Ribbon Bow Left -->
+                <path d="M60 40C60 40 35 15 30 30C25 45 60 40 60 40Z" fill="url(#goldGrad)" stroke="#FFF" stroke-width="1"/>
+                <!-- Ribbon Bow Right -->
+                <path d="M60 40C60 40 85 15 90 30C95 45 60 40 60 40Z" fill="url(#goldGrad)" stroke="#FFF" stroke-width="1"/>
+                <!-- Sparkles -->
+                <circle cx="20" cy="25" r="2.5" fill="#FFF" />
+                <circle cx="100" cy="28" r="3" fill="#FFD700" />
+                <circle cx="95" cy="95" r="2" fill="#FF69B4" />
+                <defs>
+                    <radialGradient id="glowGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60 60) rotate(90) scale(55)">
+                        <stop stop-color="#FF1493"/>
+                        <stop offset="1" stop-color="#FF1493" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="boxGrad" x1="25" y1="55" x2="95" y2="105" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#E0115F"/>
+                        <stop offset="1" stop-color="#7B0834"/>
+                    </linearGradient>
+                    <linearGradient id="lidGrad" x1="20" y1="40" x2="100" y2="58" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FF2A85"/>
+                        <stop offset="1" stop-color="#B80D4D"/>
+                    </linearGradient>
+                    <linearGradient id="goldGrad" x1="30" y1="20" x2="90" y2="105" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF3B0"/>
+                        <stop offset="0.5" stop-color="#FFD700"/>
+                        <stop offset="1" stop-color="#D4AF37"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- Call to action button -->
+        <button id="startBtn" class="btn-glow text-white font-semibold text-base sm:text-lg px-7 py-4 rounded-full tracking-wide border border-yellow-200/50 flex flex-col items-center gap-1 cursor-pointer">
+            <span class="flex items-center gap-2 text-lg sm:text-xl font-bold">
+                Tap for a Birthday Surprise 🎁
+            </span>
+            <span class="text-xs sm:text-sm font-normal text-pink-100 opacity-90">
+                (Turn up your volume 🔊)
+            </span>
+        </button>
+    </div>
+
+    <!-- CELEBRATION STATE: Romantic Typography & Message (Hidden Initially) -->
+    <div id="celebrationScreen" class="relative z-10 hidden flex-col items-center justify-center px-4 sm:px-8 text-center max-w-2xl mx-auto pointer-events-none select-none">
+        
+        <!-- Decorative Crown / Sparkle Header -->
+        <div id="titleBlock" class="mb-2">
+            <p class="text-yellow-300 tracking-[0.25em] uppercase text-xs sm:text-sm font-semibold mb-2 drop-shadow">
+                ✨ Celebration Begins ✨
+            </p>
+            <h1 class="font-royal text-3xl sm:text-5xl md:text-6xl font-bold glow-gold leading-tight tracking-wide">
+                Happy Birthday
+            </h1>
+        </div>
+
+        <!-- Romantic Script Line -->
+        <h2 id="subtitleBlock" class="font-romantic text-4xl sm:text-6xl md:text-7xl glow-pink mt-1 mb-6 py-1">
+            To My Dearest Wife <span class="heart-beat text-red-500">❤️</span>
+        </h2>
+
+        <!-- Customizable Romantic Message Box -->
+        <div id="cardBlock" class="glass-card rounded-3xl p-5 sm:p-7 max-w-lg mx-auto border border-pink-300/30 pointer-events-auto">
+            <p class="text-pink-50 text-sm sm:text-base md:text-lg leading-relaxed font-light italic">
+                "Har din tumhari muskurahat meri duniya ko roshan karti hai. Aaj ke is khaas din par, main bas yahi kehna chahta hoon ki tum meri zindagi ka sabse khoobsurat tohfa ho. May your year ahead sparkle just like these fireworks!"
+            </p>
+            <div class="mt-4 pt-3 border-t border-pink-400/20 flex items-center justify-between text-xs sm:text-sm text-pink-200/90">
+                <span>Forever Yours 💞</span>
+                <button id="burstMoreBtn" class="bg-pink-600/60 hover:bg-pink-500/80 active:scale-95 text-white px-3.5 py-1.5 rounded-full text-xs font-medium transition border border-pink-300/40 shadow pointer-events-auto cursor-pointer">
+                    Launch Heart Firework 💖
+                </button>
+            </div>
+        </div>
+
+        <!-- Tap Anywhere Hint -->
+        <p id="hintBlock" class="mt-6 text-xs sm:text-sm text-pink-200/75 tracking-wider animate-pulse">
+            ✨ Tap anywhere on the sky to launch more fireworks ✨
+        </p>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. WEB AUDIO API SYNTHESIZER (No external MP3 files required!)
+         * Synthesizes realistic firework rocket whistles, deep booms, and crackles.
+         * ============================================================================
+         */
+        class FireworkSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = false;
+                this.noiseBuffer = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                    this.createNoiseBuffer();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            // Pre-generate white noise buffer for explosions & crackles
+            createNoiseBuffer() {
+                const bufferSize = this.ctx.sampleRate * 2; // 2 seconds of noise
+                this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const output = this.noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+            }
+
+            // Soft swoosh/whistle when rocket launches upward
+            playLaunch() {
+                if (this.isMuted || !this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'sine';
+                    const startFreq = 220 + Math.random() * 120;
+                    osc.frequency.setValueAtTime(startFreq, now);
+                    osc.frequency.exponentialRampToValueAtTime(startFreq * 2.8, now + 0.35);
+
+                    gain.gain.setValueAtTime(0.01, now);
+                    gain.gain.linearRampToValueAtTime(0.04, now + 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 0.36);
+                } catch (e) {
+                    // Ignore audio context restrictions if any
+                }
+            }
+
+            // Deep boom + sparkling crackle when firework bursts
+            playExplosion(isBig = false) {
+                if (this.isMuted || !this.ctx || !this.noiseBuffer) return;
+                try {
+                    const now = this.ctx.currentTime;
+
+                    // 1. Low-end Boom Thump (Oscillator)
+                    const osc = this.ctx.createOscillator();
+                    const oscGain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(isBig ? 130 : 160, now);
+                    osc.frequency.exponentialRampToValueAtTime(28, now + (isBig ? 0.5 : 0.35));
+
+                    oscGain.gain.setValueAtTime(isBig ? 0.45 : 0.28, now);
+                    oscGain.gain.exponentialRampToValueAtTime(0.001, now + (isBig ? 0.55 : 0.38));
+
+                    osc.connect(oscGain);
+                    oscGain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + (isBig ? 0.56 : 0.4));
+
+                    // 2. Burst Noise (Filtered White Noise)
+                    const noise = this.ctx.createBufferSource();
+                    noise.buffer = this.noiseBuffer;
+
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(isBig ? 1200 : 950, now);
+                    filter.frequency.exponentialRampToValueAtTime(140, now + (isBig ? 0.9 : 0.6));
+
+                    const noiseGain = this.ctx.createGain();
+                    noiseGain.gain.setValueAtTime(isBig ? 0.5 : 0.32, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + (isBig ? 0.95 : 0.65));
+
+                    noise.connect(filter);
+                    filter.connect(noiseGain);
+                    noiseGain.connect(this.ctx.destination);
+
+                    noise.start(now);
+                    noise.stop(now + (isBig ? 1.0 : 0.7));
+
+                    // 3. High-pitched Firecracker Crackles (Pop-pop-pop)
+                    const crackleCount = isBig ? 9 : 4;
+                    for (let i = 0; i < crackleCount; i++) {
+                        const delay = 0.12 + Math.random() * 0.55;
+                        this.scheduleCrackle(now + delay);
+                    }
+                } catch (e) {}
+            }
+
+            // Individual tiny sparkler snap
+            scheduleCrackle(StartTime) {
+                if (this.isMuted || !this.ctx || !this.noiseBuffer) return;
+                const snap = this.ctx.createBufferSource();
+                snap.buffer = this.noiseBuffer;
+
+                const bandpass = this.ctx.createBiquadFilter();
+                bandpass.type = 'bandpass';
+                bandpass.frequency.setValueAtTime(2200 + Math.random() * 2500, StartTime);
+                bandpass.Q.setValueAtTime(3.0, StartTime);
+
+                const snapGain = this.ctx.createGain();
+                const duration = 0.04 + Math.random() * 0.04;
+                snapGain.gain.setValueAtTime(0.14, StartTime);
+                snapGain.gain.exponentialRampToValueAtTime(0.001, StartTime + duration);
+
+                snap.connect(bandpass);
+                bandpass.connect(snapGain);
+                snapGain.connect(this.ctx.destination);
+
+                snap.start(StartTime);
+                snap.stop(StartTime + duration);
+            }
+
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                return this.isMuted;
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 2. HTML5 CANVAS STARRY SKY & FIREWORKS ENGINE
+         * Vibrant colors: Gold, Pink, Ruby Red, Cyan, Purple
+         * ============================================================================
+         */
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        const soundEngine = new FireworkSoundEngine();
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Vibrant Romantic Color Palette
+        const PALETTE = [
+            '#FFD700', // Gold
+            '#FF1493', // Deep Pink
+            '#E0115F', // Ruby Red
+            '#00F5D4', // Vibrant Cyan
+            '#B5179E', // Royal Purple
+            '#FF69B4', // Hot Pink
+            '#FFB703'  // Warm Amber Gold
+        ];
+
+        let stars = [];
+        let rockets = [];
+        let particles = [];
+        let floatingHearts = [];
+        let celebrationActive = false;
+        let autoLaunchTimer = 0;
+
+        // Resize Listener
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            initStars();
+        });
+
+        // Create twinkling background stars
+        function initStars() {
+            stars = [];
+            const starCount = Math.floor((width * height) / 9000);
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.6 + 0.3,
+                    alpha: Math.random(),
+                    twinkleSpeed: (Math.random() * 0.02 + 0.005) * (Math.random() < 0.5 ? 1 : -1)
+                });
+            }
+        }
+
+        // Rocket Class (Shoots from bottom to target coordinate)
+        class Rocket {
+            constructor(targetX, targetY, isHeart = false) {
+                this.x = width * 0.2 + Math.random() * (width * 0.6);
+                this.y = height;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.isHeart = isHeart;
+                this.color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+                
+                const angle = Math.atan2(targetY - this.y, targetX - this.x);
+                const distance = Math.hypot(targetX - this.x, targetY - this.y);
+                const speed = Math.min(Math.max(distance / 32, 9), 16);
+
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.trail = [];
+                this.exploded = false;
+
+                soundEngine.playLaunch();
+            }
+
+            update() {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > 6) this.trail.shift();
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Check if reached near target
+                const dist = Math.hypot(this.targetX - this.x, this.targetY - this.y);
+                if (dist < 18 || this.vy >= 0 || this.y <= this.targetY) {
+                    this.exploded = true;
+                    createExplosion(this.x, this.y, this.color, this.isHeart);
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.beginPath();
+                if (this.trail.length > 1) {
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) {
+                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                }
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = '#FFF';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Explosion Particle Class
+        class Particle {
+            constructor(x, y, vx, vy, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.014 + 0.011;
+                this.gravity = 0.065;
+                this.friction = 0.975;
+                this.size = Math.random() * 2.4 + 1.2;
+                this.flicker = Math.random() > 0.35;
+            }
+
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                if (this.alpha <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = this.flicker ? this.alpha * (0.6 + Math.random() * 0.4) : this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Create Circular or Heart-shaped Firework Explosion
+        function createExplosion(x, y, primaryColor, isHeart = false) {
+            const secondaryColor = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+            soundEngine.playExplosion(isHeart);
+
+            if (isHeart) {
+                // Mathematical Heart Shape Parametric Equation
+                const count = 75;
+                for (let i = 0; i < count; i++) {
+                    const t = (Math.PI * 2 * i) / count;
+                    const hx = 16 * Math.pow(Math.sin(t), 3);
+                    const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    const scale = 0.28 + Math.random() * 0.05;
+                    const color = i % 2 === 0 ? '#E0115F' : '#FFD700';
+                    particles.push(new Particle(x, y, hx * scale, hy * scale, color));
+                }
+            } else {
+                // Multi-layered Spherical Firecracker Burst
+                const count = 85;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 6.5 + 1.2;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed;
+                    const chosenColor = Math.random() > 0.35 ? primaryColor : secondaryColor;
+                    particles.push(new Particle(x, y, vx, vy, chosenColor));
+                }
+                // Inner bright gold core sparks
+                for (let i = 0; i < 20; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 2.5 + 0.5;
+                    particles.push(new Particle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, '#FFFFFF'));
+                }
+            }
+        }
+
+        // Main Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Semi-transparent clear for smooth motion trails
+            ctx.fillStyle = celebrationActive ? 'rgba(5, 2, 10, 0.22)' : 'rgba(5, 2, 10, 0.4)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Twinkling Stars
+            for (let s of stars) {
+                s.alpha += s.twinkleSpeed;
+                if (s.alpha > 1 || s.alpha < 0.2) s.twinkleSpeed *= -1;
+                ctx.save();
+                ctx.globalAlpha = Math.max(0.1, Math.min(1, s.alpha));
+                ctx.fillStyle = '#FFF';
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Automated Fireworks Show when active
+            if (celebrationActive) {
+                autoLaunchTimer++;
+                if (autoLaunchTimer % 36 === 0) {
+                    const tx = width * 0.12 + Math.random() * (width * 0.76);
+                    const ty = height * 0.12 + Math.random() * (height * 0.45);
+                    const makeHeart = Math.random() < 0.28; // 28% chance of heart firework
+                    rockets.push(new Rocket(tx, ty, makeHeart));
+                }
+            }
+
+            // Update & Draw Rockets
+            for (let i = rockets.length - 1; i >= 0; i--) {
+                rockets[i].update();
+                rockets[i].draw();
+                if (rockets[i].exploded) {
+                    rockets.splice(i, 1);
+                }
+            }
+
+            // Update & Draw Explosion Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 3. INTERACTION & SURPRISE REVEAL LOGIC
+         * ============================================================================
+         */
+        const startScreen = document.getElementById('startScreen');
+        const celebrationScreen = document.getElementById('celebrationScreen');
+        const topControls = document.getElementById('topControls');
+        const titleBlock = document.getElementById('titleBlock');
+        const subtitleBlock = document.getElementById('subtitleBlock');
+        const cardBlock = document.getElementById('cardBlock');
+        const muteBtn = document.getElementById('muteBtn');
+        const soundIcon = document.getElementById('soundIcon');
+        const grandFinaleBtn = document.getElementById('grandFinaleBtn');
+        const burstMoreBtn = document.getElementById('burstMoreBtn');
+
+        function startSurprise(e) {
+            if (celebrationActive) return;
+            if (e) e.stopPropagation();
+
+            // Initialize Web Audio API on user gesture
+            soundEngine.init();
+            celebrationActive = true;
+
+            // Fade out initial gift screen smoothly
+            startScreen.style.opacity = '0';
+            startScreen.style.transform = 'scale(0.85)';
+            
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                // Show Celebration Screen & Controls
+                celebrationScreen.classList.remove('hidden');
+                celebrationScreen.classList.add('flex');
+                topControls.classList.remove('hidden');
+
+                // Apply Entrance Animations
+                titleBlock.classList.add('animate-title');
+                subtitleBlock.classList.add('animate-subtitle');
+                cardBlock.classList.add('animate-card');
+            }, 500);
+
+            // Launch an immediate opening barrage of fireworks!
+            launchBarrage(6);
+        }
+
+        function launchBarrage(count = 5) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const tx = width * 0.15 + Math.random() * (width * 0.7);
+                    const ty = height * 0.15 + Math.random() * (height * 0.4);
+                    rockets.push(new Rocket(tx, ty, i === count - 1));
+                }, i * 220);
+            }
+        }
+
+        // Start Listeners (Clicking anywhere on initial screen or gift box)
+        startScreen.addEventListener('click', startSurprise);
+
+        // Tap anywhere on the sky to burst firework at exact coordinate
+        canvas.addEventListener('pointerdown', (e) => {
+            if (!celebrationActive) {
+                startSurprise(e);
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Instant explosion at tap point + rocket shooting up
+            createExplosion(clickX, clickY, PALETTE[Math.floor(Math.random() * PALETTE.length)], Math.random() < 0.35);
+        });
+
+        // "Launch Heart Firework" Button inside card
+        burstMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            soundEngine.init();
+            const tx = width * 0.3 + Math.random() * (width * 0.4);
+            const ty = height * 0.18 + Math.random() * (height * 0.25);
+            createExplosion(tx, ty, '#E0115F', true);
+        });
+
+        // "Grand Finale" Button in top controls
+        grandFinaleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            soundEngine.init();
+            launchBarrage(9);
+        });
+
+        // Mute / Unmute Toggle
+        muteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const muted = soundEngine.toggleMute();
+            soundIcon.textContent = muted ? '🔇' : '🔊';
+        });
+
+        // Initialize on load
+        window.onload = () => {
+            initStars();
+            animate();
+        };
+    </script>
+</body>
+</html>
